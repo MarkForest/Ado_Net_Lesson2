@@ -20,49 +20,25 @@ namespace Ado_Net_Lesson2
             conn = new SqlConnection();
             conn.ConnectionString = stringConnection;
 
-            string sql = "select * from Authors where lastname = @p1";
+            string sql = "getBookNumber";
             SqlCommand command = new SqlCommand();
             command.CommandText = sql;
             command.Connection = conn;
-            SqlParameter param1 = new SqlParameter();
-            //param1.ParameterName = "@p1";
-            //param1.SqlDbType = SqlDbType.VarChar;
-            //param1.Value = "Messi";
-            //command.Parameters.Add(param1);
+            command.CommandType = CommandType.StoredProcedure;
 
-            //or
+            command.Parameters.Add("@authorid", SqlDbType.Int).Value = 1;
 
-            command.Parameters.Add("@p1", SqlDbType.VarChar).Value = "Messi";
-
-            //or
-
-            //command.Parameters.AddWithValue("@p1", "Messi");
-
+            SqlParameter output = new SqlParameter("@bookcount", SqlDbType.Int);
+            output.Direction = ParameterDirection.Output;
+            command.Parameters.Add(output);
 
             conn.Open();
-            SqlDataReader reader = command.ExecuteReader();
-            do
-            {
-                while (reader.Read())
-                {
-                    if (line == 0)
-                    {
-                        for (int i = 0; i < reader.FieldCount; i++)
-                        {
-                            Console.Write(reader.GetName(i) + " ");
-                        }
-                        Console.WriteLine();
-
-                    }
-
-                    line++;
-                    Console.WriteLine(reader[0] + "\t" + reader[1] + "\t" + reader[2] + "\t");
-                }
-
-            } while (reader.NextResult());
-           
-
+            command.ExecuteNonQuery();
+            Console.WriteLine(command.Parameters["@bookcount"].Value.ToString());
+            conn.Close();
             Console.ReadKey();
         }
+
+      
     }
 }
